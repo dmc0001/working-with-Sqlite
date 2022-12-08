@@ -61,10 +61,15 @@ class MainActivity : AppCompatActivity() {
         }
         binding.searchBtn.setOnClickListener {
 
-            val intent = Intent(this@MainActivity,MainActivity2::class.java)
+           /* val intent = Intent(this@MainActivity,MainActivity2::class.java)
             val data = searching.text.toString()
             intent.putExtra(extraDate,data)
-            startActivity(intent)
+            startActivity(intent)*/
+            dataBaseHelper = DataBaseHelper(this@MainActivity)
+            val r =  dataBaseHelper.searchSomeone(searching.toString())
+
+            Toast.makeText(this,r, Toast.LENGTH_SHORT).show()
+
 
         }
 

@@ -3,6 +3,7 @@ package com.example.workingwithdatabase
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
@@ -84,31 +85,34 @@ class DataBaseHelper(
 
     }
 
-    fun searchSomeone(customModule: String): List<CustomModule> {
-        val matchingList = ArrayList<CustomModule>()
-        //get data from database
-        val queryString = "SELECT * FROM $CUSTOMER_TABLE WHERE $COLUMN_CUSTOMER_NAME LIKE $customModule %"
-        val db: SQLiteDatabase = this.readableDatabase
-        val cursor = db.rawQuery(queryString, null)
-        if (cursor.moveToFirst()) {
-            do {
-                val customerID: Int = cursor.getInt(0)
-                val customerName: String = cursor.getString(1)
-                val customerAge: Int = cursor.getInt(2)
-                val customerActive: Boolean = cursor.getInt(3) == 1
-                val customModule =
-                    CustomModule(customerID, customerName, customerAge, customerActive)
-                matchingList.add(customModule)
 
-            } while (cursor.moveToNext())
-        } else {
-            //failure. do not anything to the list.
+/*
+    public Cursor Search(int ID){
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT * FROM "+tableName+" WHERE "+id+"= "+ID, null);
+        return cursor;
+    }*/
+
+    fun searchSomeone(text:String): String{
+    val db: SQLiteDatabase = this.readableDatabase
+        //val   columns   = arrayOf(COLUMN_CUSTOMER_NAME, COLUMN_CUSTOMER_AGE, COLUMN_ACTIVE_CUSTOMER)
+        val cursor = db.rawQuery("SELECT * FROM $CUSTOMER_TABLE WHERE  $COLUMN_CUSTOMER_NAME LIKE $text", null)
+       // val cursor = db.query("$CUSTOMER_TABLE $columns $COLUMN_CUSTOMER_NAME",null,null,null,null)
+
+        val stringBuffer = StringBuffer()
+
+        while (cursor.moveToNext()){
+            val index1 =cursor.getColumnIndex(COLUMN_CUSTOMER_NAME)
+            val index2 =cursor.getColumnIndex(COLUMN_CUSTOMER_AGE)
+            val index3 =cursor.getColumnIndex(COLUMN_ACTIVE_CUSTOMER)
+
+            val customerName :String = cursor.getColumnName(index1)
+            val customerAge :String = cursor.getColumnName(index2)
+            val customerIsActive :String = cursor.getColumnName(index3)
+
+           stringBuffer.append("$customerName $customerAge $customerIsActive ")
         }
-        cursor.close()
-        db.close()
-
-        return matchingList
-
+        return stringBuffer.toString()
     }
 
 

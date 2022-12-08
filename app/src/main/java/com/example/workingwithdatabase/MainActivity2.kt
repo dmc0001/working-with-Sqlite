@@ -25,18 +25,18 @@ class MainActivity2 : AppCompatActivity() {
         //binding.textView.text=txt
 
         //val clickedCustomer = CustomModule()
+        dataBaseHelper = DataBaseHelper(this@MainActivity2)
+       val a =  dataBaseHelper.searchSomeone(txt).toString()
 
 
-
-
-        customArrayAdapter = ArrayAdapter<CustomModule>(
+       /* customArrayAdapter = ArrayAdapter<CustomModule>(
             this@MainActivity2,
             R.layout.simple_list_item_1,
             dataBaseHelper.searchSomeone(txt)
         )
-        binding.listView.adapter = customArrayAdapter
+        binding.listView.adapter = customArrayAdapter*/
 
-        Toast.makeText(this,txt, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this,a, Toast.LENGTH_SHORT).show()
 
     }
 
