@@ -29,6 +29,7 @@ class DataBaseHelper(
     }
 
     fun addOne(customModule: CustomModule): Boolean {
+
         val db: SQLiteDatabase = this.writableDatabase
         val cv = ContentValues()
         cv.put(COLUMN_CUSTOMER_NAME, customModule.name)
@@ -36,10 +37,22 @@ class DataBaseHelper(
         cv.put(COLUMN_ACTIVE_CUSTOMER, customModule.isActive)
         val insert = db.insert(CUSTOMER_TABLE, null, cv)
 
-        if (insert > -1) {
+        return insert > -1
+
+    }
+
+    fun deleteOne(customModule: CustomModule): Boolean {
+
+        val db: SQLiteDatabase = this.writableDatabase
+        val queryString = "DELETE FROM $CUSTOMER_TABLE WHERE $COLUMN_ID = ${customModule.id}"
+        val cursor = db.rawQuery(queryString, null)
+
+        if (cursor.moveToFirst()) {
             return true
         }
         return false
+
+
     }
 
     fun getEveryone(): List<CustomModule> {
@@ -68,6 +81,33 @@ class DataBaseHelper(
         db.close()
 
         return returnList
+
+    }
+
+    fun searchSomeone(customModule: String): List<CustomModule> {
+        val matchingList = ArrayList<CustomModule>()
+        //get data from database
+        val queryString = "SELECT * FROM $CUSTOMER_TABLE WHERE $COLUMN_CUSTOMER_NAME LIKE $customModule %"
+        val db: SQLiteDatabase = this.readableDatabase
+        val cursor = db.rawQuery(queryString, null)
+        if (cursor.moveToFirst()) {
+            do {
+                val customerID: Int = cursor.getInt(0)
+                val customerName: String = cursor.getString(1)
+                val customerAge: Int = cursor.getInt(2)
+                val customerActive: Boolean = cursor.getInt(3) == 1
+                val customModule =
+                    CustomModule(customerID, customerName, customerAge, customerActive)
+                matchingList.add(customModule)
+
+            } while (cursor.moveToNext())
+        } else {
+            //failure. do not anything to the list.
+        }
+        cursor.close()
+        db.close()
+
+        return matchingList
 
     }
 
