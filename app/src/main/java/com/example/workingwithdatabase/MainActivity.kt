@@ -65,10 +65,17 @@ class MainActivity : AppCompatActivity() {
             val data = searching.text.toString()
             intent.putExtra(extraDate,data)
             startActivity(intent)*/
-            dataBaseHelper = DataBaseHelper(this@MainActivity)
-            val r =  dataBaseHelper.searchSomeone(searching.toString())
+            
+            try{
 
-            Toast.makeText(this,r, Toast.LENGTH_SHORT).show()
+               // val r =  dataBaseHelper.searchSomeone(searching.text.toString())
+                val v = dataBaseHelper.search(searching.text.toString())
+
+                Toast.makeText(this,v.toString(), Toast.LENGTH_SHORT).show()
+            }
+            catch (e : Exception){
+                Toast.makeText(this,"sorry we can't find this client", Toast.LENGTH_SHORT).show()
+            }
 
 
         }

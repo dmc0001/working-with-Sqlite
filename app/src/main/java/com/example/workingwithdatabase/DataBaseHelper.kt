@@ -4,6 +4,7 @@ package com.example.workingwithdatabase
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
+
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
@@ -93,26 +94,80 @@ class DataBaseHelper(
         return cursor;
     }*/
 
-    fun searchSomeone(text:String): String{
-    val db: SQLiteDatabase = this.readableDatabase
-        //val   columns   = arrayOf(COLUMN_CUSTOMER_NAME, COLUMN_CUSTOMER_AGE, COLUMN_ACTIVE_CUSTOMER)
-        val cursor = db.rawQuery("SELECT * FROM $CUSTOMER_TABLE WHERE  $COLUMN_CUSTOMER_NAME LIKE $text", null)
-       // val cursor = db.query("$CUSTOMER_TABLE $columns $COLUMN_CUSTOMER_NAME",null,null,null,null)
+    fun searchSomeone(text: String): List<CustomModule> {
+        val returnList = ArrayList<CustomModule>()
+        //get data from database
+        val queryString = "SELECT * FROM $CUSTOMER_TABLE WHERE $COLUMN_CUSTOMER_NAME LIKE %$text%"
+        val db: SQLiteDatabase = this.readableDatabase
+        val cursor = db.rawQuery(queryString, null)
+        if (cursor.moveToFirst()) {
+            do {
+                val customerID: Int = cursor.getInt(0)
+                val customerName: String = cursor.getString(1)
+                val customerAge: Int = cursor.getInt(2)
+                val customerActive: Boolean = cursor.getInt(3) == 1
+                val customModule =
+                    CustomModule(customerID, customerName, customerAge, customerActive)
+                returnList.add(customModule)
 
-        val stringBuffer = StringBuffer()
+            } while (cursor.moveToNext())
+        } else {
+            //failure. do not anything to the list.
 
-        while (cursor.moveToNext()){
-            val index1 =cursor.getColumnIndex(COLUMN_CUSTOMER_NAME)
-            val index2 =cursor.getColumnIndex(COLUMN_CUSTOMER_AGE)
-            val index3 =cursor.getColumnIndex(COLUMN_ACTIVE_CUSTOMER)
-
-            val customerName :String = cursor.getColumnName(index1)
-            val customerAge :String = cursor.getColumnName(index2)
-            val customerIsActive :String = cursor.getColumnName(index3)
-
-           stringBuffer.append("$customerName $customerAge $customerIsActive ")
         }
-        return stringBuffer.toString()
+
+        cursor.close()
+        db.close()
+
+        return returnList
+
+    }
+
+    fun search(searchTerm: String): List<CustomModule> {
+
+        //When reading data should always just get a readable database
+        val db: SQLiteDatabase = this.readableDatabase
+        val cursor: Cursor = db.query(
+            //Name of the table read from
+            /* table = */ CUSTOMER_TABLE,
+            //String array of the columns which are supposed to be read
+            /* columns = */ arrayOf(
+                COLUMN_ID,
+                COLUMN_CUSTOMER_NAME,
+                COLUMN_CUSTOMER_AGE,
+                COLUMN_ACTIVE_CUSTOMER
+            ),
+            //The selection argument which specifies which row is read .
+            //? symbols are argument
+            /* selection = */ COLUMN_CUSTOMER_NAME + "LIKE ?",
+            /* selectionArgs = */ arrayOf("%$searchTerm%"),
+            /* groupBy = */ null,
+            /* having = */ null,
+            /* orderBy = */ null
+        )
+        val idIndex = cursor.getColumnIndex(COLUMN_ID)
+        val nameIndex: Int = cursor.getColumnIndex(COLUMN_CUSTOMER_NAME)
+        val ageIndex: Int = cursor.getColumnIndex(COLUMN_CUSTOMER_AGE)
+        val activeIndex: Int = cursor.getColumnIndex(COLUMN_ACTIVE_CUSTOMER)
+
+        try {
+            if (!cursor.moveToFirst()) {
+                return ArrayList()
+            }
+            val customer = arrayListOf<CustomModule>()
+            do {
+                val id: Int = cursor.getInt(idIndex)
+                val name: String = cursor.getString(nameIndex)
+                val age: Int = cursor.getInt(ageIndex)
+                val active: Boolean = cursor.getString(activeIndex).toBoolean()
+                customer.add(CustomModule(id, name, age, active))
+            } while (cursor.moveToNext())
+            return customer
+        } finally {
+            cursor.close()
+            db.close()
+        }
+
     }
 
 
@@ -122,6 +177,7 @@ class DataBaseHelper(
         const val COLUMN_CUSTOMER_NAME: String = "CUSTOMER_NAME"
         const val COLUMN_CUSTOMER_AGE: String = "CUSTOMER_AGE"
         const val COLUMN_ACTIVE_CUSTOMER: String = "ACTIVE_CUSTOMER"
+
     }
 
 }
