@@ -1,8 +1,9 @@
 package com.example.workingwithdatabase
+
+//noinspection SuspiciousImport
 import android.R
 import android.content.Intent
 import android.os.Build
-
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ArrayAdapter
@@ -11,12 +12,12 @@ import androidx.annotation.RequiresApi
 import com.example.workingwithdatabase.MainActivity.Constant.extraDate
 import com.example.workingwithdatabase.databinding.ActivityMainBinding
 
-lateinit var binding: ActivityMainBinding
+
 
 class MainActivity : AppCompatActivity() {
-
+    private lateinit var binding: ActivityMainBinding
     private lateinit var customArrayAdapter : ArrayAdapter<CustomModule>
-    lateinit var dataBaseHelper : DataBaseHelper
+    private lateinit var dataBaseHelper : DataBaseHelper
 
 
     @RequiresApi(Build.VERSION_CODES.P)
@@ -51,7 +52,7 @@ class MainActivity : AppCompatActivity() {
             dataBaseHelper = DataBaseHelper(this@MainActivity)
 
             if((userName.text.toString()!="")&&(userAge.text.toString().toInt()!=0)){
-                var success = dataBaseHelper.addOne(customModule)
+                val success = dataBaseHelper.addOne(customModule)
                 Toast.makeText(this,"success : $success",Toast.LENGTH_SHORT).show()
             }else {
                 Toast.makeText(this, "success : false ", Toast.LENGTH_SHORT).show()
@@ -61,22 +62,10 @@ class MainActivity : AppCompatActivity() {
         }
         binding.searchBtn.setOnClickListener {
 
-           /* val intent = Intent(this@MainActivity,MainActivity2::class.java)
+            val intent = Intent(this@MainActivity,MainActivity2::class.java)
             val data = searching.text.toString()
             intent.putExtra(extraDate,data)
-            startActivity(intent)*/
-            
-            try{
-
-               // val r =  dataBaseHelper.searchSomeone(searching.text.toString())
-                val v = dataBaseHelper.search(searching.text.toString())
-
-                Toast.makeText(this,v.toString(), Toast.LENGTH_SHORT).show()
-            }
-            catch (e : Exception){
-                Toast.makeText(this,"sorry we can't find this client", Toast.LENGTH_SHORT).show()
-            }
-
+            startActivity(intent)
 
         }
 

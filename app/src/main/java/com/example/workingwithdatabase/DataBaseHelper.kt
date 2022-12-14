@@ -3,7 +3,6 @@ package com.example.workingwithdatabase
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
@@ -48,12 +47,7 @@ class DataBaseHelper(
         val db: SQLiteDatabase = this.writableDatabase
         val queryString = "DELETE FROM $CUSTOMER_TABLE WHERE $COLUMN_ID = ${customModule.id}"
         val cursor = db.rawQuery(queryString, null)
-
-        if (cursor.moveToFirst()) {
-            return true
-        }
-        return false
-
+        return cursor.moveToFirst()
 
     }
 
@@ -85,21 +79,14 @@ class DataBaseHelper(
         return returnList
 
     }
-
-
-/*
-    public Cursor Search(int ID){
-        SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.rawQuery("SELECT * FROM "+tableName+" WHERE "+id+"= "+ID, null);
-        return cursor;
-    }*/
-
-    fun searchSomeone(text: String): List<CustomModule> {
+    //search someone by name and return the result as a list
+    fun searchSomeone( text: String): List<CustomModule> {
         val returnList = ArrayList<CustomModule>()
         //get data from database
-        val queryString = "SELECT * FROM $CUSTOMER_TABLE WHERE $COLUMN_CUSTOMER_NAME LIKE %$text%"
+        val queryString = "SELECT * FROM $CUSTOMER_TABLE WHERE $COLUMN_CUSTOMER_NAME LIKE '%$text%' "
         val db: SQLiteDatabase = this.readableDatabase
-        val cursor = db.rawQuery(queryString, null)
+        val cursor = db.rawQuery(queryString,null)
+       // val cursor = db.rawQuery(queryString, null)
         if (cursor.moveToFirst()) {
             do {
                 val customerID: Int = cursor.getInt(0)
@@ -123,52 +110,6 @@ class DataBaseHelper(
 
     }
 
-    fun search(searchTerm: String): List<CustomModule> {
-
-        //When reading data should always just get a readable database
-        val db: SQLiteDatabase = this.readableDatabase
-        val cursor: Cursor = db.query(
-            //Name of the table read from
-            /* table = */ CUSTOMER_TABLE,
-            //String array of the columns which are supposed to be read
-            /* columns = */ arrayOf(
-                COLUMN_ID,
-                COLUMN_CUSTOMER_NAME,
-                COLUMN_CUSTOMER_AGE,
-                COLUMN_ACTIVE_CUSTOMER
-            ),
-            //The selection argument which specifies which row is read .
-            //? symbols are argument
-            /* selection = */ COLUMN_CUSTOMER_NAME + "LIKE ?",
-            /* selectionArgs = */ arrayOf("%$searchTerm%"),
-            /* groupBy = */ null,
-            /* having = */ null,
-            /* orderBy = */ null
-        )
-        val idIndex = cursor.getColumnIndex(COLUMN_ID)
-        val nameIndex: Int = cursor.getColumnIndex(COLUMN_CUSTOMER_NAME)
-        val ageIndex: Int = cursor.getColumnIndex(COLUMN_CUSTOMER_AGE)
-        val activeIndex: Int = cursor.getColumnIndex(COLUMN_ACTIVE_CUSTOMER)
-
-        try {
-            if (!cursor.moveToFirst()) {
-                return ArrayList()
-            }
-            val customer = arrayListOf<CustomModule>()
-            do {
-                val id: Int = cursor.getInt(idIndex)
-                val name: String = cursor.getString(nameIndex)
-                val age: Int = cursor.getInt(ageIndex)
-                val active: Boolean = cursor.getString(activeIndex).toBoolean()
-                customer.add(CustomModule(id, name, age, active))
-            } while (cursor.moveToNext())
-            return customer
-        } finally {
-            cursor.close()
-            db.close()
-        }
-
-    }
 
 
     companion object {
@@ -177,6 +118,7 @@ class DataBaseHelper(
         const val COLUMN_CUSTOMER_NAME: String = "CUSTOMER_NAME"
         const val COLUMN_CUSTOMER_AGE: String = "CUSTOMER_AGE"
         const val COLUMN_ACTIVE_CUSTOMER: String = "ACTIVE_CUSTOMER"
+
 
     }
 
