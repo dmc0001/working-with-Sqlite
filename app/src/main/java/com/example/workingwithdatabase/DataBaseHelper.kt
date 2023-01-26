@@ -86,7 +86,6 @@ class DataBaseHelper(
         val queryString = "SELECT * FROM $CUSTOMER_TABLE WHERE $COLUMN_CUSTOMER_NAME LIKE '%$text%' "
         val db: SQLiteDatabase = this.readableDatabase
         val cursor = db.rawQuery(queryString,null)
-       // val cursor = db.rawQuery(queryString, null)
         if (cursor.moveToFirst()) {
             do {
                 val customerID: Int = cursor.getInt(0)
